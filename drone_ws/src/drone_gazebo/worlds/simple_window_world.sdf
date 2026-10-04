@@ -1,0 +1,398 @@
+<sdf version="1.9">
+  <world name="aperture">
+    <physics name="default" type="ignored">
+      <max_step_size>0.002</max_step_size>
+      <real_time_factor>1</real_time_factor>
+    </physics>
+    <gravity>0 0 -9.81</gravity>
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics" />
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands" />
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster" />
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu" />
+    <scene>
+      <ambient>0.5 0.5 0.5 1</ambient>
+      <background>0.06 0.08 0.12 1</background>
+    </scene>
+    <light name="sun" type="directional">
+      <pose>0 0 8 0 0 0</pose>
+      <diffuse>1.0 1.0 1.0 1</diffuse>
+      <direction>-.3 .2 -1</direction>
+      <cast_shadows>true</cast_shadows>
+    </light>
+    <model name="room">
+      <static>true</static>
+      <link name="structure">
+        <collision name="floor_collision">
+          <pose>3 0 -0.05 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>14 10 0.1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="floor_visual">
+          <pose>3 0 -0.05 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>14 10 0.1</size>
+            </box>
+          </geometry>
+          <material>
+            <diffuse>0.12 0.17 0.22 1</diffuse>
+            <ambient>0.12 0.17 0.22 1</ambient>
+          </material>
+        </visual>
+        <collision name="back_wall_collision">
+          <pose>9 0 2 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.15 10 4</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="back_wall_visual">
+          <pose>9 0 2 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.15 10 4</size>
+            </box>
+          </geometry>
+          <material>
+            <diffuse>0.2 0.24 0.28 1</diffuse>
+            <ambient>0.2 0.24 0.28 1</ambient>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="window_wall">
+      <static>true</static>
+      <pose>5.0 0.0 1.5 0 0 0</pose>
+      <link name="wall">
+        <collision name="left_collision">
+          <pose>0 -1.9 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.15 3 4</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="left_visual">
+          <pose>0 -1.9 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.15 3 4</size>
+            </box>
+          </geometry>
+          <material>
+            <diffuse>0.3 0.38 0.48 1</diffuse>
+            <ambient>0.3 0.38 0.48 1</ambient>
+          </material>
+        </visual>
+        <collision name="right_collision">
+          <pose>0 1.9 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.15 3 4</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="right_visual">
+          <pose>0 1.9 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.15 3 4</size>
+            </box>
+          </geometry>
+          <material>
+            <diffuse>0.3 0.38 0.48 1</diffuse>
+            <ambient>0.3 0.38 0.48 1</ambient>
+          </material>
+        </visual>
+        <collision name="bottom_collision">
+          <pose>0 0 -1.15 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.15 0.8 1.7</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="bottom_visual">
+          <pose>0 0 -1.15 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.15 0.8 1.7</size>
+            </box>
+          </geometry>
+          <material>
+            <diffuse>0.3 0.38 0.48 1</diffuse>
+            <ambient>0.3 0.38 0.48 1</ambient>
+          </material>
+        </visual>
+        <collision name="top_collision">
+          <pose>0 0 1.15 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.15 0.8 1.7</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="top_visual">
+          <pose>0 0 1.15 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.15 0.8 1.7</size>
+            </box>
+          </geometry>
+          <material>
+            <diffuse>0.3 0.38 0.48 1</diffuse>
+            <ambient>0.3 0.38 0.48 1</ambient>
+          </material>
+        </visual>
+        <collision name="trim_left_collision">
+          <pose>0 -0.41250000000000003 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.16999999999999998 0.025 0.6</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="trim_left_visual">
+          <pose>0 -0.41250000000000003 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.16999999999999998 0.025 0.6</size>
+            </box>
+          </geometry>
+          <material>
+            <diffuse>0.65 0.9 0.78 1</diffuse>
+            <ambient>0.65 0.9 0.78 1</ambient>
+          </material>
+        </visual>
+        <collision name="trim_right_collision">
+          <pose>0 0.41250000000000003 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.16999999999999998 0.025 0.6</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="trim_right_visual">
+          <pose>0 0.41250000000000003 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.16999999999999998 0.025 0.6</size>
+            </box>
+          </geometry>
+          <material>
+            <diffuse>0.65 0.9 0.78 1</diffuse>
+            <ambient>0.65 0.9 0.78 1</ambient>
+          </material>
+        </visual>
+        <collision name="trim_top_collision">
+          <pose>0 0 0.3125 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.16999999999999998 0.8 0.025</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="trim_top_visual">
+          <pose>0 0 0.3125 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.16999999999999998 0.8 0.025</size>
+            </box>
+          </geometry>
+          <material>
+            <diffuse>0.65 0.9 0.78 1</diffuse>
+            <ambient>0.65 0.9 0.78 1</ambient>
+          </material>
+        </visual>
+        <collision name="trim_bottom_collision">
+          <pose>0 0 -0.3125 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.16999999999999998 0.8 0.025</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="trim_bottom_visual">
+          <pose>0 0 -0.3125 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.16999999999999998 0.8 0.025</size>
+            </box>
+          </geometry>
+          <material>
+            <diffuse>0.65 0.9 0.78 1</diffuse>
+            <ambient>0.65 0.9 0.78 1</ambient>
+          </material>
+        </visual>
+      </link>
+    </model>
+    <model name="drone">
+      <pose>0.0 0.15 1.5 0 0 0</pose>
+      <link name="base_link">
+        <gravity>false</gravity>
+        <inertial>
+          <mass>1.0</mass>
+          <inertia>
+            <ixx>0.012</ixx>
+            <iyy>0.012</iyy>
+            <izz>0.022</izz>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyz>0</iyz>
+          </inertia>
+        </inertial>
+        <visual name="body_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.2 0.13 0.1</size>
+            </box>
+          </geometry>
+          <material>
+            <diffuse>0.15 0.7 0.55 1</diffuse>
+            <ambient>0.15 0.7 0.55 1</ambient>
+          </material>
+        </visual>
+        <collision name="vehicle_envelope">
+          <geometry>
+            <box>
+              <size>0.36 0.36 0.16</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="arm_-0.12_-0.12_visual">
+          <pose>0 0 0 0 0 -2.356194490192345</pose>
+          <geometry>
+            <box>
+              <size>0.3 0.025 0.025</size>
+            </box>
+          </geometry>
+          <material>
+            <diffuse>0.2 0.25 0.3 1</diffuse>
+            <ambient>0.2 0.25 0.3 1</ambient>
+          </material>
+        </visual>
+        <visual name="prop_-0.12_-0.12">
+          <pose>-0.12 -0.12 .04 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.06</radius>
+              <length>0.008</length>
+            </cylinder>
+          </geometry>
+        </visual>
+        <visual name="arm_-0.12_0.12_visual">
+          <pose>0 0 0 0 0 2.356194490192345</pose>
+          <geometry>
+            <box>
+              <size>0.3 0.025 0.025</size>
+            </box>
+          </geometry>
+          <material>
+            <diffuse>0.2 0.25 0.3 1</diffuse>
+            <ambient>0.2 0.25 0.3 1</ambient>
+          </material>
+        </visual>
+        <visual name="prop_-0.12_0.12">
+          <pose>-0.12 0.12 .04 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.06</radius>
+              <length>0.008</length>
+            </cylinder>
+          </geometry>
+        </visual>
+        <visual name="arm_0.12_-0.12_visual">
+          <pose>0 0 0 0 0 -0.7853981633974483</pose>
+          <geometry>
+            <box>
+              <size>0.3 0.025 0.025</size>
+            </box>
+          </geometry>
+          <material>
+            <diffuse>0.2 0.25 0.3 1</diffuse>
+            <ambient>0.2 0.25 0.3 1</ambient>
+          </material>
+        </visual>
+        <visual name="prop_0.12_-0.12">
+          <pose>0.12 -0.12 .04 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.06</radius>
+              <length>0.008</length>
+            </cylinder>
+          </geometry>
+        </visual>
+        <visual name="arm_0.12_0.12_visual">
+          <pose>0 0 0 0 0 0.7853981633974483</pose>
+          <geometry>
+            <box>
+              <size>0.3 0.025 0.025</size>
+            </box>
+          </geometry>
+          <material>
+            <diffuse>0.2 0.25 0.3 1</diffuse>
+            <ambient>0.2 0.25 0.3 1</ambient>
+          </material>
+        </visual>
+        <visual name="prop_0.12_0.12">
+          <pose>0.12 0.12 .04 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.06</radius>
+              <length>0.008</length>
+            </cylinder>
+          </geometry>
+        </visual>
+        <sensor name="rgbd" type="rgbd_camera">
+          <pose>.18 0 .03 0 0 0</pose>
+          <always_on>true</always_on>
+          <update_rate>30</update_rate>
+          <topic>/drone/rgbd</topic>
+          <gz_frame_id>camera_optical_frame</gz_frame_id>
+          <camera>
+            <horizontal_fov>1.5707963</horizontal_fov>
+            <image>
+              <width>640</width>
+              <height>480</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.05</near>
+              <far>20</far>
+            </clip>
+            <depth_camera>
+              <clip>
+                <near>0.05</near>
+                <far>20</far>
+              </clip>
+            </depth_camera>
+          </camera>
+        </sensor>
+        <sensor name="imu" type="imu">
+          <always_on>true</always_on>
+          <update_rate>100</update_rate>
+          <topic>/drone/imu</topic>
+          <gz_frame_id>imu_link</gz_frame_id>
+        </sensor>
+      </link>
+      <plugin filename="gz-sim-velocity-control-system" name="gz::sim::systems::VelocityControl">
+        <topic>/drone/cmd_vel</topic>
+      </plugin>
+      <plugin filename="gz-sim-odometry-publisher-system" name="gz::sim::systems::OdometryPublisher">
+        <odom_frame>odom</odom_frame>
+        <robot_base_frame>base_link</robot_base_frame>
+        <odom_topic>/drone/odom</odom_topic>
+        <odom_publish_frequency>50</odom_publish_frequency>
+        <dimensions>3</dimensions>
+      </plugin>
+    </model>
+  </world>
+</sdf>

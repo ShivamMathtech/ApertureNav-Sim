@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="aperturenav_drone">
+ <xacro:property name="mass" value="1.0"/>
+ <link name="base_link"><inertial><mass value="${mass}"/><inertia ixx="0.012" iyy="0.012" izz="0.022" ixy="0" ixz="0" iyz="0"/></inertial><visual><geometry><box size="0.20 0.13 0.1"/></geometry><material name="teal"><color rgba="0.1 0.8 0.6 1"/></material></visual><collision><geometry><box size="0.36 0.36 0.16"/></geometry></collision></link>
+ <xacro:macro name="rotor" params="id x y"><link name="rotor_${id}"><visual><geometry><cylinder radius="0.06" length="0.008"/></geometry></visual></link><joint name="rotor_${id}_joint" type="fixed"><parent link="base_link"/><child link="rotor_${id}"/><origin xyz="${x} ${y} 0.04"/></joint></xacro:macro>
+ <xacro:rotor id="1" x="0.12" y="0.12"/><xacro:rotor id="2" x="0.12" y="-0.12"/><xacro:rotor id="3" x="-0.12" y="0.12"/><xacro:rotor id="4" x="-0.12" y="-0.12"/>
+ <link name="camera_link"/><joint name="camera_joint" type="fixed"><parent link="base_link"/><child link="camera_link"/><origin xyz="0.18 0 0.03"/></joint>
+ <link name="camera_optical_frame"/><joint name="optical_joint" type="fixed"><parent link="camera_link"/><child link="camera_optical_frame"/><origin rpy="${-pi/2} 0 ${-pi/2}"/></joint>
+ <link name="depth_camera_link"/><joint name="depth_joint" type="fixed"><parent link="camera_link"/><child link="depth_camera_link"/></joint>
+ <link name="depth_camera_optical_frame"/><joint name="depth_optical_joint" type="fixed"><parent link="camera_optical_frame"/><child link="depth_camera_optical_frame"/></joint>
+ <link name="imu_link"/><joint name="imu_joint" type="fixed"><parent link="base_link"/><child link="imu_link"/></joint>
+</robot>
