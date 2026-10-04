@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+[project]
+name = "aperturenav-sim"
+version = "0.1.0"
+description = "Simulation-first aperture navigation research baseline"
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.24", "PyYAML>=6"]
+[project.optional-dependencies]
+vision = ["opencv-python-headless>=4.8"]
+web = ["fastapi>=0.115", "uvicorn>=0.30"]
+[project.scripts]
+aperturenav = "aperturenav.cli:main"
+[tool.setuptools.packages.find]
+include = ["aperturenav*"]

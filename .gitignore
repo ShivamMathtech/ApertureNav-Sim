@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.venv/
+node_modules/
+dist/
+drone_ws/build/
+drone_ws/install/
+drone_ws/log/
+experiments/results/*
+!experiments/results/.gitkeep
