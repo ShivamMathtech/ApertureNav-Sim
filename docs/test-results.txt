@@ -1,0 +1,20 @@
+test_localization_valid_and_invalid_depth (test_core.Tests.test_localization_valid_and_invalid_depth) ... ok
+test_minimum_jerk_endpoints (test_core.Tests.test_minimum_jerk_endpoints) ... ok
+test_nominal_traversal_and_reset (test_core.Tests.test_nominal_traversal_and_reset) ... ok
+test_pid_limits (test_core.Tests.test_pid_limits) ... ok
+test_rotated_aperture (test_core.Tests.test_rotated_aperture) ... ok
+test_sensor_timeout_and_invalid_transition (test_core.Tests.test_sensor_timeout_and_invalid_transition) ... ok
+test_swept_collision_prevents_tunnelling (test_core.Tests.test_swept_collision_prevents_tunnelling) ... ok
+test_threshold_rejected (test_core.Tests.test_threshold_rejected) ... ok
+test_too_small_aborts_before_frame (test_core.Tests.test_too_small_aborts_before_frame) ... ok
+test_scenario_validation_commands_and_stream (test_vision_api.ApiTests.test_scenario_validation_commands_and_stream) ... /tmp/aperturenav-verified/starlette/testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+  _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+ok
+test_blank_has_no_candidates (test_vision_api.VisionTests.test_blank_has_no_candidates) ... ok
+test_multiple_openings (test_vision_api.VisionTests.test_multiple_openings) ... ok
+test_rectangle_under_noise_blur_and_dim_light (test_vision_api.VisionTests.test_rectangle_under_noise_blur_and_dim_light) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 1.332s
+
+OK

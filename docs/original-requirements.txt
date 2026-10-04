@@ -1,0 +1,1939 @@
+# MASTER DEVELOPMENT PROMPT
+
+## Build a Complete ROS 2 + Gazebo Drone Aperture Navigation Simulator
+
+You are a senior multidisciplinary robotics engineering team consisting of:
+
+- ROS 2 architect
+- Gazebo simulation engineer
+- UAV/drone controls engineer
+- computer vision engineer
+- robotics perception engineer
+- path-planning engineer
+- 3D geometry engineer
+- PX4 integration engineer
+- Python developer
+- C++ developer
+- full-stack engineer
+- UI/UX engineer
+- DevOps engineer
+- QA/testing engineer
+- robotics researcher
+
+Your task is to design and implement a complete, modular, production-quality simulation platform called:
+
+# ApertureNav-Sim
+
+## Autonomous Drone Aperture Detection, Alignment, and Confined-Space Navigation Simulator
+
+The simulator must allow a quadrotor to detect and navigate through small openings such as:
+
+- windows
+- square frames
+- rectangular frames
+- circular openings
+- ventilation openings
+- door-like gaps
+- broken-wall openings
+- custom apertures
+- rotated frames
+- partially obstructed openings
+
+The project is simulation-first and intended for robotics research, education, algorithm development, perception experiments, motion planning, and controller evaluation.
+
+Do not assume a physical drone is connected.
+
+---
+
+# 1. REQUIRED PLATFORM
+
+Primary environment:
+
+```text
+Windows 11
+WSL2
+Ubuntu 24.04 LTS
+ROS 2 Jazzy
+Gazebo Harmonic
+RViz2
+Python 3
+C++
+OpenCV
+NumPy
+ros_gz
+```
+
+Optional advanced stage:
+
+```text
+PX4 SITL
+Micro XRCE-DDS
+ROS 2 PX4 bridge
+```
+
+The first working version must not depend on PX4.
+
+---
+
+# 2. PRIMARY SYSTEM OBJECTIVES
+
+The simulator must:
+
+1. Launch Gazebo automatically.
+2. Spawn a configurable quadrotor.
+3. Load configurable indoor environments.
+4. Simulate RGB camera.
+5. Simulate depth camera.
+6. Simulate IMU.
+7. Simulate odometry.
+8. Optionally simulate LiDAR.
+9. Detect apertures/windows.
+10. Estimate aperture geometry.
+11. Estimate 3D aperture pose.
+12. Calculate whether the drone can fit.
+13. Approach the target opening.
+14. Align position and heading.
+15. Generate a trajectory through the aperture.
+16. Execute the trajectory.
+17. Avoid frame collision.
+18. Abort when conditions become unsafe.
+19. Visualize everything in RViz.
+20. Expose telemetry to a professional UI.
+21. Record complete experiment data.
+22. Generate post-run analytics.
+23. Reset and rerun scenarios without restarting the entire stack.
+
+---
+
+# 3. REQUIRED REPOSITORY STRUCTURE
+
+Create:
+
+```text
+aperturenav_sim/
+│
+├── README.md
+├── LICENSE
+├── requirements.txt
+├── .gitignore
+│
+├── docs/
+│   ├── architecture.md
+│   ├── windows_setup.md
+│   ├── ros2_setup.md
+│   ├── gazebo_setup.md
+│   ├── topics.md
+│   ├── tf_tree.md
+│   ├── simulation.md
+│   ├── perception.md
+│   ├── localization.md
+│   ├── planning.md
+│   ├── control.md
+│   ├── safety.md
+│   ├── dashboard.md
+│   ├── experiments.md
+│   └── troubleshooting.md
+│
+├── drone_ws/
+│   └── src/
+│       ├── drone_interfaces/
+│       ├── drone_description/
+│       ├── drone_gazebo/
+│       ├── drone_bringup/
+│       ├── aperture_perception/
+│       ├── aperture_localization/
+│       ├── aperture_clearance/
+│       ├── trajectory_planner/
+│       ├── flight_controller/
+│       ├── collision_monitor/
+│       ├── mission_manager/
+│       ├── telemetry_logger/
+│       ├── scenario_manager/
+│       └── simulator_ui_bridge/
+│
+├── dashboard/
+│   ├── backend/
+│   └── frontend/
+│
+├── experiments/
+│   ├── configs/
+│   ├── results/
+│   ├── rosbags/
+│   └── plots/
+│
+└── scripts/
+    ├── setup_ubuntu.sh
+    ├── install_ros_dependencies.sh
+    ├── build.sh
+    ├── run_sim.sh
+    ├── run_dashboard.sh
+    ├── clean.sh
+    └── reset_experiment.sh
+```
+
+Every ROS package must contain fully valid:
+
+```text
+package.xml
+setup.py or CMakeLists.txt
+resource files
+config
+launch files
+source code
+tests
+README
+```
+
+Do not use placeholders.
+
+---
+
+# 4. ROS 2 ARCHITECTURE
+
+Use modular ROS 2 nodes.
+
+Required nodes:
+
+```text
+/drone_model_node
+/aperture_detector
+/aperture_localizer
+/clearance_estimator
+/trajectory_planner
+/flight_controller
+/collision_monitor
+/mission_manager
+/telemetry_logger
+/scenario_manager
+/ui_bridge
+```
+
+All nodes must:
+
+- use ROS parameters
+- support `use_sim_time`
+- publish diagnostics
+- use structured logs
+- handle clean shutdown
+- support launch remapping
+- expose configuration through YAML
+
+---
+
+# 5. DRONE MODEL
+
+Create a proper configurable quadrotor using URDF/Xacro.
+
+Include:
+
+```text
+base_link
+four arms
+four motors
+four propellers
+RGB camera
+depth camera
+IMU
+optional LiDAR
+collision geometry
+visual geometry
+inertial properties
+```
+
+Provide:
+
+```text
+mass
+inertia
+arm length
+drone width
+drone height
+camera pose
+sensor update rates
+```
+
+Use valid inertial tensors.
+
+Provide simple meshes or primitives so the project can run without external CAD assets.
+
+---
+
+# 6. TF TREE
+
+Implement:
+
+```text
+world
+└── map
+    └── odom
+        └── base_link
+            ├── camera_link
+            │   └── camera_optical_frame
+            ├── depth_camera_link
+            │   └── depth_camera_optical_frame
+            ├── imu_link
+            └── lidar_link
+```
+
+When aperture is detected, publish:
+
+```text
+aperture_frame
+```
+
+All TF transforms must be timestamped using simulation time.
+
+---
+
+# 7. GAZEBO SIMULATION
+
+Use Gazebo Harmonic.
+
+Provide realistic but stable physics settings.
+
+Create these worlds:
+
+```text
+empty_test_world.sdf
+simple_window_world.sdf
+small_window_world.sdf
+multiple_windows_world.sdf
+rotated_window_world.sdf
+circular_aperture_world.sdf
+irregular_gap_world.sdf
+obstacle_room_world.sdf
+low_light_world.sdf
+noisy_sensor_world.sdf
+```
+
+Each world must support configurable:
+
+```text
+opening width
+opening height
+opening position
+opening orientation
+wall thickness
+lighting
+floor texture
+obstacles
+drone spawn pose
+```
+
+---
+
+# 8. CUSTOM APERTURE MODELS
+
+Create reusable Gazebo models for:
+
+```text
+rectangular_window
+square_frame
+small_window
+circular_hole
+ventilation_hole
+broken_wall_opening
+custom_frame
+```
+
+Expose parameters:
+
+```text
+width
+height
+radius
+thickness
+position
+yaw
+pitch
+roll
+```
+
+---
+
+# 9. SENSOR SIMULATION
+
+Required sensors:
+
+## RGB Camera
+
+Publish:
+
+```text
+/drone/camera/image_raw
+/drone/camera/camera_info
+```
+
+## Depth Camera
+
+Publish:
+
+```text
+/drone/depth/image_raw
+/drone/depth/camera_info
+/drone/depth/points
+```
+
+## IMU
+
+Publish:
+
+```text
+/drone/imu
+```
+
+## Odometry
+
+Publish:
+
+```text
+/drone/odom
+```
+
+## Optional LiDAR
+
+Publish:
+
+```text
+/drone/lidar/scan
+```
+
+Use `ros_gz_bridge` properly.
+
+---
+
+# 10. CAMERA SETTINGS
+
+Initial camera configuration:
+
+```text
+resolution: 640x480
+fps: 30
+horizontal_fov: configurable
+near_clip: configurable
+far_clip: configurable
+```
+
+Depth sensor:
+
+```text
+640x480
+10–30 FPS
+configurable range
+configurable noise
+```
+
+---
+
+# 11. APERTURE PERCEPTION MODULE
+
+Implement multiple interchangeable detector modes.
+
+## Detector A — Classical Vision
+
+Pipeline:
+
+```text
+RGB
+↓
+grayscale
+↓
+Gaussian blur
+↓
+Canny edge detection
+↓
+contours
+↓
+polygon approximation
+↓
+quadrilateral filtering
+↓
+geometry scoring
+↓
+best aperture candidate
+```
+
+Use OpenCV functions such as:
+
+```python
+cv2.cvtColor
+cv2.GaussianBlur
+cv2.Canny
+cv2.findContours
+cv2.approxPolyDP
+cv2.contourArea
+cv2.minAreaRect
+```
+
+Evaluate:
+
+```text
+area
+aspect ratio
+rectangularity
+edge strength
+symmetry
+center consistency
+depth consistency
+```
+
+---
+
+# 12. PERCEPTION OUTPUT
+
+Publish:
+
+```text
+/aperture/detection
+/aperture/polygon
+/aperture/center_pixel
+/aperture/confidence
+/aperture/debug_image
+```
+
+Create custom messages where appropriate.
+
+---
+
+# 13. OPTIONAL SEGMENTATION DETECTOR
+
+Design a second perception backend supporting:
+
+```text
+deep segmentation
+semantic segmentation
+instance segmentation
+YOLO segmentation
+custom trained model
+```
+
+Do not require this for the baseline.
+
+Implement clean plugin/backend abstraction so detector mode can be selected through YAML.
+
+---
+
+# 14. 3D APERTURE LOCALIZATION
+
+Use:
+
+```text
+camera intrinsics
+depth image
+TF2
+detected aperture corners
+```
+
+Calculate:
+
+```text
+aperture center XYZ
+opening width
+opening height
+distance
+surface normal
+orientation
+pose covariance
+```
+
+Publish:
+
+```text
+/aperture/pose
+/aperture/dimensions
+/aperture/normal
+/aperture/distance
+/aperture/localization_confidence
+```
+
+Publish `aperture_frame`.
+
+---
+
+# 15. CLEARANCE ESTIMATION
+
+Inputs:
+
+```text
+drone width
+drone height
+aperture width
+aperture height
+position uncertainty
+orientation uncertainty
+controller error allowance
+safety margin
+```
+
+Compute:
+
+```text
+horizontal_clearance
+vertical_clearance
+minimum_clearance
+safe_to_enter
+```
+
+Condition:
+
+```text
+opening_width > drone_width + 2 * safety_margin
+
+opening_height > drone_height + 2 * safety_margin
+```
+
+Account for rotated approach angle.
+
+Publish:
+
+```text
+/aperture/safe_to_enter
+/aperture/horizontal_clearance
+/aperture/vertical_clearance
+/aperture/minimum_clearance
+```
+
+---
+
+# 16. MISSION STATE MACHINE
+
+Implement exactly:
+
+```text
+IDLE
+TAKEOFF
+SEARCH
+TARGET_DETECTED
+APPROACH
+ALIGN_POSITION
+ALIGN_YAW
+VERIFY_CLEARANCE
+READY_TO_ENTER
+ENTER
+PASS_THROUGH
+CLEAR_APERTURE
+HOVER
+COMPLETE
+ABORT
+EMERGENCY_HOVER
+```
+
+Every transition must:
+
+- log reason
+- store timestamp
+- publish current state
+- reject invalid transitions
+
+---
+
+# 17. SEARCH MODE
+
+Search behavior can initially be simple:
+
+```text
+hover
+slow yaw scan
+detect aperture
+select best candidate
+```
+
+Later support:
+
+```text
+grid search
+waypoint search
+multi-aperture selection
+```
+
+---
+
+# 18. APPROACH STRATEGY
+
+Generate approach point:
+
+```text
+P_pre = aperture_center - aperture_normal * approach_distance
+```
+
+Approach slowly.
+
+Configurable:
+
+```text
+approach_distance
+approach_speed
+```
+
+---
+
+# 19. ALIGNMENT
+
+Position error:
+
+```text
+e_position = aperture_center - drone_center
+```
+
+Align:
+
+```text
+horizontal offset
+vertical offset
+yaw error
+```
+
+Allow transition only when:
+
+```text
+|horizontal_error| < tolerance
+|vertical_error| < tolerance
+|yaw_error| < tolerance
+```
+
+---
+
+# 20. TRAJECTORY PLANNER
+
+Baseline planner must generate:
+
+```text
+pre-entry waypoint
+aperture center waypoint
+post-entry waypoint
+```
+
+Where:
+
+```text
+P_pre
+P_center
+P_post
+```
+
+are aligned along aperture normal.
+
+Support smooth interpolation.
+
+---
+
+# 21. ADVANCED TRAJECTORY OPTIONS
+
+Design planner interfaces for:
+
+```text
+linear
+cubic spline
+B-spline
+minimum jerk
+minimum snap
+A*
+RRT*
+MPC-based trajectory
+```
+
+Baseline can use smooth waypoint interpolation.
+
+---
+
+# 22. FLIGHT CONTROLLER
+
+Implement simulated position control.
+
+Start with PID.
+
+Per-axis:
+
+```text
+x
+y
+z
+yaw
+```
+
+Equation:
+
+```text
+u = Kp * e + Ki * integral(e) + Kd * derivative(e)
+```
+
+Add:
+
+```text
+anti-windup
+velocity limit
+acceleration limit
+yaw-rate limit
+deadband
+low-pass filter
+```
+
+---
+
+# 23. CONTROL TOPICS
+
+Subscribe:
+
+```text
+/planner/trajectory
+/drone/odom
+/mission/state
+```
+
+Publish:
+
+```text
+/drone/cmd_vel
+/controller/error
+/controller/status
+/controller/diagnostics
+```
+
+---
+
+# 24. ENTRY MODE
+
+When entering a narrow opening:
+
+Reduce speed.
+
+Example parameters:
+
+```yaml
+approach_speed: 0.40
+entry_speed: 0.15
+exit_speed: 0.25
+```
+
+During entry:
+
+- freeze unnecessary yaw motion
+- limit roll
+- limit pitch
+- maintain aperture centerline
+- continuously monitor clearance
+- abort on unsafe condition
+
+---
+
+# 25. COLLISION MONITOR
+
+Continuously monitor:
+
+```text
+depth image
+LiDAR
+drone pose
+planned path
+wall geometry
+aperture frame
+```
+
+Detect:
+
+```text
+front obstacle
+side obstacle
+frame proximity
+unsafe trajectory
+minimum distance violation
+```
+
+Actions:
+
+```text
+warning
+slow down
+hover
+abort
+```
+
+---
+
+# 26. EMERGENCY BEHAVIOR
+
+If any of the following occur:
+
+```text
+target lost
+depth invalid
+sensor timeout
+controller divergence
+clearance too small
+obstacle detected
+excessive roll/pitch
+trajectory invalid
+```
+
+Then:
+
+```text
+stop forward motion
+hover
+publish fault
+transition to ABORT or EMERGENCY_HOVER
+```
+
+---
+
+# 27. SCENARIO MANAGER
+
+Allow complete scenario configuration with YAML.
+
+Example:
+
+```yaml
+scenario:
+  world: simple_window_world
+
+drone:
+  spawn:
+    x: 0.0
+    y: 0.0
+    z: 1.5
+    yaw: 0.0
+
+aperture:
+  width: 0.8
+  height: 0.6
+  x: 5.0
+  y: 0.0
+  z: 1.5
+  yaw: 0.0
+
+environment:
+  lighting: normal
+  wind: low
+
+sensor_noise:
+  rgb: low
+  depth: low
+```
+
+---
+
+# 28. RANDOMIZED SCENARIOS
+
+Support experiment randomization:
+
+```text
+window size
+window pose
+drone start pose
+lighting
+texture
+sensor noise
+wind
+obstacle layout
+```
+
+Allow deterministic experiments using:
+
+```text
+random_seed
+```
+
+---
+
+# 29. RVIZ CONFIGURATION
+
+Provide a ready-made RViz config displaying:
+
+```text
+drone model
+TF
+camera image
+depth image
+point cloud
+aperture frame
+trajectory
+waypoints
+odometry
+drone path
+collision markers
+clearance markers
+```
+
+---
+
+# 30. VISUALIZATION MARKERS
+
+Use:
+
+```text
+visualization_msgs/Marker
+MarkerArray
+```
+
+Display:
+
+```text
+aperture center
+aperture normal
+opening boundary
+safe clearance region
+pre-entry waypoint
+center waypoint
+post-entry waypoint
+planned path
+drone trail
+```
+
+---
+
+# 31. TELEMETRY LOGGER
+
+Store:
+
+```text
+timestamp
+position
+orientation
+velocity
+acceleration
+mission state
+aperture dimensions
+aperture pose
+distance
+alignment error
+minimum clearance
+controller error
+detection confidence
+localization confidence
+FPS
+latency
+```
+
+---
+
+# 32. EXPERIMENT FOLDER
+
+For every run:
+
+```text
+experiments/results/YYYYMMDD_HHMMSS/
+```
+
+Generate:
+
+```text
+config.yaml
+summary.json
+telemetry.csv
+trajectory.csv
+events.csv
+metrics.csv
+plots/
+rosbag/
+```
+
+---
+
+# 33. REQUIRED METRICS
+
+Compute:
+
+```text
+detection success rate
+false detection rate
+center localization error
+depth error
+pose error
+alignment error
+trajectory tracking RMSE
+minimum clearance
+collision count
+mission success
+mission duration
+path length
+average speed
+maximum speed
+maximum acceleration
+perception FPS
+end-to-end latency
+```
+
+Primary metric:
+
+```text
+Successful Aperture Traversal Rate
+```
+
+---
+
+# 34. TEST SCENARIOS
+
+Generate benchmark scenarios for:
+
+## Width
+
+```text
+1.20 m
+1.00 m
+0.80 m
+0.60 m
+0.50 m
+0.45 m
+```
+
+## Approach angle
+
+```text
+0°
+10°
+20°
+30°
+45°
+```
+
+## Lighting
+
+```text
+bright
+normal
+dim
+backlit
+```
+
+## Noise
+
+```text
+none
+low
+medium
+high
+```
+
+## Disturbance
+
+```text
+none
+low
+medium
+```
+
+---
+
+# 35. UI REQUIREMENTS
+
+Build a modern dark dashboard.
+
+Technology:
+
+```text
+React
+TypeScript
+FastAPI
+WebSocket
+Three.js
+```
+
+---
+
+# 36. UI LAYOUT
+
+## Header
+
+Display:
+
+```text
+ApertureNav-Sim
+Simulation
+Environment
+Scenarios
+Analytics
+Settings
+```
+
+## Main Viewport
+
+Show:
+
+```text
+drone
+wall
+opening
+planned path
+current trajectory
+aperture frame
+safety corridor
+```
+
+## Camera Panel
+
+Tabs:
+
+```text
+FPV
+Front
+Top
+Side
+```
+
+## Sensor Panel
+
+Tabs:
+
+```text
+RGB
+Depth
+Point Cloud
+Segmentation
+```
+
+## Telemetry Panel
+
+Display:
+
+```text
+X Y Z
+roll pitch yaw
+velocity
+mission state
+distance to opening
+opening width
+opening height
+minimum clearance
+confidence
+FPS
+latency
+```
+
+## Control Panel
+
+Buttons:
+
+```text
+Start Simulation
+Pause
+Reset
+Takeoff
+Start Mission
+Hover
+Abort
+Emergency Stop
+```
+
+Modes:
+
+```text
+Manual
+Assisted
+Autonomous
+```
+
+---
+
+# 37. ROS TO WEB BRIDGE
+
+Build a FastAPI backend.
+
+Architecture:
+
+```text
+ROS node
+↓
+telemetry aggregator
+↓
+FastAPI
+↓
+WebSocket
+↓
+React frontend
+```
+
+Send:
+
+```text
+telemetry
+mission state
+trajectory
+aperture geometry
+alerts
+sensor metadata
+```
+
+Use compressed image transport for live camera views.
+
+---
+
+# 38. 3D DASHBOARD
+
+Use Three.js.
+
+Display:
+
+```text
+drone mesh
+room
+wall
+window
+trajectory
+waypoints
+aperture normal
+drone path history
+collision radius
+```
+
+Synchronize with ROS telemetry.
+
+---
+
+# 39. ANALYTICS PAGE
+
+Plot:
+
+```text
+position vs time
+velocity vs time
+roll/pitch/yaw
+alignment error
+distance to aperture
+clearance
+controller error
+confidence
+FPS
+latency
+```
+
+Also show:
+
+```text
+2D top-down path
+3D trajectory
+```
+
+---
+
+# 40. REQUIRED CUSTOM ROS MESSAGES
+
+Create messages similar to:
+
+```text
+ApertureDetection.msg
+AperturePose.msg
+ClearanceStatus.msg
+MissionStatus.msg
+ControllerStatus.msg
+SafetyStatus.msg
+```
+
+Example:
+
+```text
+ApertureDetection.msg
+
+std_msgs/Header header
+geometry_msgs/Point32[4] corners
+geometry_msgs/Point center_pixel
+float32 confidence
+string detector_type
+```
+
+---
+
+# 41. ROS SERVICES
+
+Create services:
+
+```text
+/reset_simulation
+/start_mission
+/abort_mission
+/set_scenario
+/reset_experiment
+```
+
+---
+
+# 42. ROS ACTIONS
+
+Use ROS actions where appropriate.
+
+Recommended:
+
+```text
+FollowTrajectory.action
+ExecuteMission.action
+```
+
+---
+
+# 43. LAUNCH FILES
+
+Provide:
+
+```text
+drone_description.launch.py
+gazebo_world.launch.py
+sensors.launch.py
+perception.launch.py
+localization.launch.py
+planner.launch.py
+controller.launch.py
+mission.launch.py
+dashboard_bridge.launch.py
+```
+
+and final:
+
+```text
+full_simulation.launch.py
+```
+
+---
+
+# 44. ONE-COMMAND START
+
+The complete simulator must start with:
+
+```bash
+cd ~/drone_ws
+source /opt/ros/jazzy/setup.bash
+source install/setup.bash
+ros2 launch drone_bringup full_simulation.launch.py
+```
+
+Optional helper:
+
+```bash
+./scripts/run_sim.sh
+```
+
+---
+
+# 45. BUILD SCRIPT
+
+Create:
+
+```bash
+scripts/build.sh
+```
+
+It must:
+
+```text
+source ROS
+run rosdep
+run colcon build --symlink-install
+report failures clearly
+```
+
+---
+
+# 46. SETUP SCRIPT
+
+Create:
+
+```text
+scripts/setup_ubuntu.sh
+```
+
+Install repository-specific dependencies.
+
+Do not perform destructive operations.
+
+Print each step clearly.
+
+---
+
+# 47. TESTING
+
+Provide:
+
+```text
+unit tests
+ROS node tests
+launch tests
+geometry tests
+clearance tests
+planner tests
+controller tests
+perception tests
+mission state tests
+scenario smoke tests
+```
+
+Tests must run using:
+
+```bash
+colcon test
+```
+
+---
+
+# 48. PERCEPTION TESTING
+
+Provide synthetic test images and Gazebo scenario-based tests.
+
+Validate:
+
+```text
+correct aperture
+no aperture
+multiple apertures
+partially occluded aperture
+rotated aperture
+low light
+blur
+noise
+```
+
+---
+
+# 49. CLEARANCE TESTING
+
+Validate edge cases:
+
+```text
+opening much larger than drone
+opening barely larger
+opening exactly at threshold
+opening too small
+rotated drone
+rotated aperture
+uncertainty margin too large
+```
+
+---
+
+# 50. CONTROLLER TESTING
+
+Test:
+
+```text
+step response
+position convergence
+overshoot
+steady-state error
+yaw convergence
+trajectory tracking
+disturbance recovery
+```
+
+---
+
+# 51. SIMULATION RESET
+
+Reset must:
+
+```text
+pause physics
+reset drone pose
+clear trajectory
+clear mission state
+clear perception state
+clear logs
+reset controller
+resume physics
+```
+
+without restarting Gazebo.
+
+---
+
+# 52. OPTIONAL PX4 PHASE
+
+After baseline simulator works, add optional PX4 integration.
+
+Support:
+
+```text
+PX4 SITL
+ROS 2 communication
+offboard setpoints
+position control
+mission state integration
+```
+
+Keep PX4 integration isolated in a separate package.
+
+The baseline project must still work without PX4.
+
+---
+
+# 53. PERFORMANCE GOALS
+
+Initial target:
+
+```text
+RGB camera: 30 FPS
+perception: 15+ FPS
+control loop: 50–100 Hz
+mission manager: 10–20 Hz
+UI telemetry: 10–20 Hz
+```
+
+Avoid blocking calls inside ROS callbacks.
+
+Use timers, queues, and asynchronous processing appropriately.
+
+---
+
+# 54. CODE QUALITY
+
+Python:
+
+```text
+type hints
+dataclasses where suitable
+PEP8
+docstrings
+logging
+unit tests
+```
+
+C++:
+
+```text
+modern C++17 or later
+RAII
+smart pointers
+ROS logging
+parameter validation
+```
+
+No:
+
+```text
+placeholder functions
+empty TODO modules
+fake outputs
+hardcoded path dependencies
+silent exception swallowing
+```
+
+---
+
+# 55. CONFIGURATION RULES
+
+Every important parameter must come from YAML.
+
+Examples:
+
+```text
+controller gains
+camera settings
+opening dimensions
+safety margins
+speed limits
+detection thresholds
+mission timeouts
+physics parameters
+```
+
+---
+
+# 56. LOGGING
+
+Use ROS logging levels:
+
+```text
+DEBUG
+INFO
+WARN
+ERROR
+FATAL
+```
+
+Log:
+
+```text
+state changes
+detection events
+target loss
+clearance failure
+planner failure
+controller saturation
+mission abort
+mission success
+```
+
+---
+
+# 57. SAFETY CONFIGURATION
+
+Provide default conservative values:
+
+```yaml
+safety:
+  min_clearance: 0.10
+  max_entry_speed: 0.15
+  max_approach_speed: 0.40
+  max_roll_deg: 15
+  max_pitch_deg: 15
+  max_yaw_error_deg: 5
+  stale_sensor_timeout: 0.5
+  target_lost_timeout: 1.0
+```
+
+These are simulation defaults and must remain configurable.
+
+---
+
+# 58. BEGINNER-FRIENDLY README
+
+README must explain:
+
+```text
+what ROS is
+what Gazebo is
+what WSL is
+what a workspace is
+what colcon is
+what a ROS node is
+what a topic is
+what TF is
+what RViz is
+how to build
+how to launch
+how to stop
+how to reset
+how to debug
+```
+
+Include copy-paste commands.
+
+---
+
+# 59. WINDOWS SETUP
+
+README must include exact sequence:
+
+```text
+Enable virtualization
+Install WSL2
+Install Ubuntu 24.04
+Update Ubuntu
+Install ROS 2 Jazzy
+Install Gazebo Harmonic
+Install ros_gz
+Test talker/listener
+Test Gazebo
+Test RViz
+Create workspace
+Build workspace
+Launch simulator
+```
+
+---
+
+# 60. TROUBLESHOOTING
+
+Document fixes for:
+
+```text
+ros2 not found
+Gazebo not launching
+RViz not launching
+package not found
+TF missing
+camera topic missing
+ros_gz bridge missing
+colcon build failure
+WSL GUI issue
+slow Gazebo
+OpenGL issue
+Python dependency conflict
+```
+
+---
+
+# 61. DEVELOPMENT ORDER
+
+Implement in this exact order:
+
+## Phase 1
+
+Environment setup.
+
+## Phase 2
+
+ROS workspace and packages.
+
+## Phase 3
+
+Drone URDF.
+
+## Phase 4
+
+Gazebo world.
+
+## Phase 5
+
+Sensors.
+
+## Phase 6
+
+ROS-Gazebo bridge.
+
+## Phase 7
+
+RViz visualization.
+
+## Phase 8
+
+Classical aperture perception.
+
+## Phase 9
+
+3D localization.
+
+## Phase 10
+
+Clearance estimator.
+
+## Phase 11
+
+Trajectory planner.
+
+## Phase 12
+
+PID controller.
+
+## Phase 13
+
+Mission manager.
+
+## Phase 14
+
+Collision monitor.
+
+## Phase 15
+
+Experiment logger.
+
+## Phase 16
+
+Dashboard.
+
+## Phase 17
+
+Scenario randomization.
+
+## Phase 18
+
+Testing.
+
+## Phase 19
+
+Performance tuning.
+
+## Phase 20
+
+Optional PX4 integration.
+
+Never jump directly to the advanced phase.
+
+---
+
+# 62. INTERMEDIATE ACCEPTANCE TESTS
+
+After every phase, the repository must remain runnable.
+
+Example checkpoints:
+
+```text
+Checkpoint 1:
+ROS talker/listener works
+
+Checkpoint 2:
+Drone appears in RViz
+
+Checkpoint 3:
+Drone appears in Gazebo
+
+Checkpoint 4:
+Camera topic publishes
+
+Checkpoint 5:
+Window world loads
+
+Checkpoint 6:
+Window detected in image
+
+Checkpoint 7:
+3D aperture pose published
+
+Checkpoint 8:
+Clearance is calculated
+
+Checkpoint 9:
+Planner publishes path
+
+Checkpoint 10:
+Drone aligns with aperture
+
+Checkpoint 11:
+Drone crosses opening
+
+Checkpoint 12:
+Dashboard shows live telemetry
+```
+
+---
+
+# 63. FINAL ACCEPTANCE TEST
+
+The simulator is complete only when this works:
+
+1. User launches one command.
+2. Gazebo opens.
+3. Drone spawns.
+4. Indoor environment loads.
+5. Camera begins publishing.
+6. Depth sensor publishes.
+7. Aperture is detected.
+8. 3D aperture pose is estimated.
+9. Clearance is calculated.
+10. Mission manager selects approach.
+11. Planner generates trajectory.
+12. Drone moves toward the aperture.
+13. Drone aligns.
+14. Safety monitor validates clearance.
+15. Drone enters slowly.
+16. Drone crosses the frame without collision.
+17. Drone reaches post-entry point.
+18. Mission state changes to COMPLETE.
+19. Experiment data is saved.
+20. Dashboard displays results.
+21. Reset allows another run.
+
+---
+
+# 64. OUTPUT EXPECTATION FROM THE CODING MODEL
+
+Do not only explain architecture.
+
+Actually generate the repository.
+
+For every development phase:
+
+1. Show the files being created.
+2. Provide complete source code.
+3. Keep package dependencies correct.
+4. Keep launch files synchronized.
+5. Keep README commands updated.
+6. Build-test the project.
+7. Fix discovered errors.
+8. Never replace working code with pseudocode.
+9. Never leave critical modules unfinished.
+10. Produce a final project that can run from a fresh documented setup.
+
+At the end, provide:
+
+```text
+full repository tree
+setup instructions
+build instructions
+run instructions
+test instructions
+architecture explanation
+ROS topic map
+TF tree
+parameter reference
+troubleshooting guide
+experiment workflow
+```
+
+The implementation must prioritize stability, modularity, reproducibility, and simulation safety over unnecessary complexity.
